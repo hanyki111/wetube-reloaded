@@ -1,13 +1,20 @@
+//-> 글로벌 라우터
+
 / -> Home
 /join -> Join
 /login -> Login
-/search -> Search -> 글로벌 라우터
+/search -> Search
 
-/users/edit
-/users/delete -> 유저 라우터
+//-> 유저 라우터
 
-/videos/watch
-/videos/edit
-/videos/delete
-/videos/comments
-/videos/comments/delete -> 비디오 라우터...
+/users/:id -> see user (profile)
+/users/logout -> log out
+/users/edit -> edit my profile
+/users/delete -> delete my profile
+
+//-> 비디오 라우터...
+
+/videos/:id -> see video
+/videos/:id/edit
+/videos/:id/delete
+/videos/upload -> upload video
