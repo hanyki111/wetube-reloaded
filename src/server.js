@@ -8,12 +8,19 @@ const PORT = 4000;
 
 // app을 만듦
 const app = express();
-app.use(morgan("dev"));
 
+// 뷰 엔진 사용
+app.set("view engine", "pug");
+app.set("views", process.cwd() + "/src/views");
+
+//
+app.use(morgan("dev"));
 // 라우터 선언
 app.use("/", globalRouter);
 app.use("/videos", videoRouter);
 app.use("/users", userRouter);
+
+app.disable("x-powered-by");
 
 // app 설정함
 // get request에 응답하는 방법 등등
