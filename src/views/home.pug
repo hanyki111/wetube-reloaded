@@ -1,4 +1,10 @@
-extends base.pug
+extends base
+include mixins/video
 
 block content 
-    h1 Home!
+    h2 welcome!
+
+    each uploadedvideo in videos 
+        +video(uploadedvideo)
+    else 
+        div Sorry Nothing found.
