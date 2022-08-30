@@ -35,10 +35,38 @@ export const watch = (req, res) => {
 
   return res.render("watch", { pageTitle: `Watching ${video.title}`, video });
 };
-export const edit = (req, res) => {
-  console.log(req.params);
-  return res.send("Edit");
+
+export const getEdit = (req, res) => {
+  const { id } = req.params;
+  const video = videos[id - 1];
+  return res.render("edit", { pageTitle: `Editing: ${video.title}`, video });
 };
-export const search = (req, res) => res.send("Search");
-export const upload = (req, res) => res.send("Upload");
-export const deleteVideo = (req, res) => res.send("Delete Video");
+
+export const postEdit = (req, res) => {
+  const { id } = req.params;
+  const { title } = req.body;
+
+  // database 이후 수정. 중요하지 않음
+
+  videos[id - 1].title = title;
+
+  return res.redirect(`/videos/${id}`);
+};
+
+export const getUpload = (req, res) => {
+  return res.render("upload", { pageTitle: "Upload Video" });
+};
+
+export const postUpload = (req, res) => {
+  // 비디오를 videos array에 추가
+  const newVideo = {
+    title: req.body.title,
+    rating: 0,
+    comments: 0,
+    createAt: "just now",
+    views: 1,
+    id: videos.length + 1,
+  };
+  videos.push(newVideo);
+  return res.redirect("/");
+};
