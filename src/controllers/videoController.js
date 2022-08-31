@@ -1,3 +1,4 @@
+import { Schema } from "mongoose";
 import Video from "../models/Video";
 
 export const home = async (req, res) => {
@@ -28,14 +29,17 @@ export const getEdit = async (req, res) => {
 export const postEdit = async (req, res) => {
   const { id } = req.params;
   const { title, description, hashtags } = req.body;
-  const video = await Video.findById(id);
+  const video = await Video.exists({ _id: id });
   if (!video) {
     // video 가 null일 경우
     return res.render("404", { pageTitle: "Video not found." });
   }
-
-  return res.render("edit", { pageTitle: `Edit: ${video.title}`, video });
-
+  // video가 null 이 아닐 경우
+  await Video.findByIdAndUpdate(id, {
+    title,
+    description,
+    hashtags: Video.formatHashtags(hashtags),
+  });
   return res.redirect(`/videos/${id}`);
 };
 
@@ -51,7 +55,7 @@ export const postUpload = async (req, res) => {
       title: title,
       description: description,
       createdAt: Date.now(),
-      hashtags: hashtags.split(",").map((word) => `#${word}`),
+      hashtags: Video.formatHashtags(hashtags),
     }); // model.save() 는 promise를 리턴함. document가 리턴됨
     return res.redirect("/");
   } catch (error) {
@@ -60,4 +64,12 @@ export const postUpload = async (req, res) => {
       errorMessage: error._message,
     });
   }
+};
+
+export const deleteVideo = async (req, res) => {
+  const { id } = req.params;
+  console.log(id);
+  await Video.findByIdAndDelete(id);
+
+  return res.redirect("/");
 };
