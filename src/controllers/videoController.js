@@ -2,7 +2,7 @@ import { Schema } from "mongoose";
 import Video from "../models/Video";
 
 export const home = async (req, res) => {
-  const videos = await Video.find({});
+  const videos = await Video.find({}).sort({ createdAt: "desc" });
   console.log(videos);
   return res.render("home.pug", { pageTitle: "Home", videos });
 };
@@ -72,4 +72,18 @@ export const deleteVideo = async (req, res) => {
   await Video.findByIdAndDelete(id);
 
   return res.redirect("/");
+};
+
+export const search = async (req, res) => {
+  const { keyword } = req.query;
+  let videos = [];
+  if (keyword) {
+    // 키워드가 존재한다 -> search
+    videos = await Video.find({
+      title: {
+        $regex: new RegExp(keyword, "i"),
+      },
+    });
+  }
+  return res.render("search", { pageTitle: "Search", videos });
 };
