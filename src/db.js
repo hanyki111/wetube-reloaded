@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-mongoose.connect(proess.env.DB_URL, { useNewUrlParser: true });
+mongoose.connect(process.env.DB_URL, { useNewUrlParser: true });
 
 const db = mongoose.connection;
 const handleOpen = () => console.log("Connected to DB");

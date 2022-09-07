@@ -25,7 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 //express-session 사용
 app.use(
   session({
-    secret: process.env.COOCKE_SECRET,
+    secret: process.env.COOKIE_SECRET,
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: process.env.DB_URL }),
