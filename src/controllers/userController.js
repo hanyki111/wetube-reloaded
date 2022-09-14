@@ -1,4 +1,5 @@
 import User from "../models/User";
+import fetch from "node-fetch";
 import bcrypt from "bcrypt";
 
 export const getJoin = (req, res) => res.render("join", { pageTitle: "Join" });
@@ -88,14 +89,66 @@ export const finishGithubLogin = async (req, res) => {
   };
   const params = new URLSearchParams(config).toString();
   const finalUrl = `${baseUrl}?${params}`;
-  const data = await fetch(finalUrl, {
+  const tokenRequest = await(
+    await fetch(finalUrl, {
     method: "POST",
     headers: {
       Accept: "application/json",
     },
-  });
-  const json = await data.json();
+  })
+  ).json();
+
+  if ("access_token" in tokenRequest){
+    // access api
+    const {access_token} = tokenRequest;
+    const apiUrl = "https://api.github.com"
+    const userData = await (
+      await fetch(`${apiUrl}/user`, {
+      headers: {
+        Authorization: `token ${access_token}`,
+      },
+    })
+    ).json();
+    // console.log(userData);
+    const emailData = await (
+      await fetch (`${apiUrl}/user/emails`, {
+        headers: {
+          Authorization: `token ${access_token}`
+        },
+      })
+    ).json();
+    // console.log(emailData);
+    const emailObj = emailData.find((emailObj) => emailObj.primary===true && emailObj.verified ===true);
+
+    if (!emailObj) {
+      return res.redirect("/login")
+    } 
+    let user = await User.findOne({email: emailObj.email});
+
+    if (!user) {
+      // create an account
+      const user = await User.create({
+        email: emailObj.email,
+        avatarUrl: userData.avatar_url,
+        username: userData.login,
+        password:"",
+        name: userData.name,
+        location: userData.location,
+        socialOnly: true,
+      });
+    }
+    req.session.loggedIn = true;
+    req.session.user = user;
+    return res.redirect("/");
+    
+  } else {
+    return res.redirect("/login")
+  }
 };
 
-export const logout = (req, res) => res.send("logout");
+export const logout = (req, res) => {
+  req.session.destroy();
+  return res.redirect("/");
+}
 export const see = (req, res) => res.send("See User");
+  
