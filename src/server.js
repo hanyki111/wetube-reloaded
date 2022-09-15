@@ -35,6 +35,7 @@ app.use(
 app.use(localsMiddleware);
 
 // 라우터 선언
+app.use("/uploads", express.static("uploads"));
 app.use("/", rootRouter);
 app.use("/videos", videoRouter);
 app.use("/users", userRouter);

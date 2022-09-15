@@ -40,23 +40,28 @@ export const getEdit = (req, res) => {
 };
 
 export const postEdit = async (req, res) => {
-  const changes = email !== req.body.email ? true : false;
-
+  const changes = req.session.user.email !== req.body.email ? true : false;
   const exists = await User.exists({
     $or: [{ email: req.body.email }],
   });
 
+  // 입력한 정보
   const {
     session: {
-      user: { _id },
+      user: { _id, avatarUrl },
     },
     body: { name, email, username, location },
+    file,
   } = req;
   // 위의 코드는 다음과 같다
   // const id = req.session.user.id;
   // const {name, email, username, location} = req.body;
 
+  // 아바타 파일 -> req.file
+
   // username, email에 change가 있는가?
+
+  console.log(file);
   if (exists && changes) {
     return res.status(400).render("edit-profile", {
       pageTitle: "Edit Profile",
@@ -66,6 +71,7 @@ export const postEdit = async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       _id,
       {
+        avatarUrl: file ? file.path : avatarUrl, // 파일이 존재한다면 file.path, 존재하지 않으면(수정하지 않으면) 기존 avatar url
         name: name,
         email: email,
         usernname: username,
