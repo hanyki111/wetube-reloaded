@@ -7,6 +7,7 @@ const videoSchema = new mongoose.Schema({
   fileUrl: { type: String, required: true },
   createdAt: { type: Date, required: true, default: Date.now },
   hashtags: [{ type: String, trim: true }],
+  owner: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "User" }, //object ID는 mongoose에서만 사용 가능
   meta: {
     views: { type: Number, default: 0 },
     rating: { type: Number, default: 0 },

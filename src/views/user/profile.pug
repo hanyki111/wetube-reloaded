@@ -1,0 +1,6 @@
+extends ../base
+include ../mixins/video
+
+block content 
+    each uploadedvideo in user.videos 
+        +video(uploadedvideo)

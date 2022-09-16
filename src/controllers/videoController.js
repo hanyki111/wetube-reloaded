@@ -1,4 +1,5 @@
 import { Schema } from "mongoose";
+import User from "../models/User";
 import Video from "../models/Video";
 
 export const home = async (req, res) => {
@@ -9,7 +10,10 @@ export const home = async (req, res) => {
 
 export const watch = async (req, res) => {
   const { id } = req.params;
-  const video = await Video.findById(id);
+  // const uploader = await User.findById(video.owner);
+  // mongoose 의 ref에서 언급하고 있기 때문에 변경.
+  const video = await Video.findById(id).populate("owner");
+
   if (video) {
     return res.render("watch", { pageTitle: video.title, video });
   }
@@ -48,17 +52,22 @@ export const getUpload = (req, res) => {
 };
 
 export const postUpload = async (req, res) => {
+  const sessionuser = req.session.user;
   const file = req.file;
   const { title, description, hashtags } = req.body;
 
   try {
-    await Video.create({
+    const newVideo = await Video.create({
       title: title,
       description: description,
       fileUrl: file.path,
+      owner: sessionuser._id,
       createdAt: Date.now(),
       hashtags: Video.formatHashtags(hashtags),
     }); // model.save() 는 promise를 리턴함. document가 리턴됨
+    const user = await User.findById(sessionuser._id);
+    user.videos.push(newVideo._id);
+    user.save();
     return res.redirect("/");
   } catch (error) {
     return res.render("upload", {

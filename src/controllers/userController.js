@@ -1,4 +1,5 @@
 import User from "../models/User";
+import Video from "../models/Video";
 import fetch from "node-fetch";
 import bcrypt from "bcrypt";
 
@@ -61,7 +62,6 @@ export const postEdit = async (req, res) => {
 
   // username, email에 change가 있는가?
 
-  console.log(file);
   if (exists && changes) {
     return res.status(400).render("edit-profile", {
       pageTitle: "Edit Profile",
@@ -200,7 +200,6 @@ export const logout = (req, res) => {
   req.session.destroy();
   return res.redirect("/");
 };
-export const see = (req, res) => res.send("See User");
 
 export const getChangePassword = (req, res) => {
   if (req.session.user.socialOnly === true) {
@@ -244,4 +243,23 @@ export const postChangePassword = async (req, res) => {
 
   // 로그아웃
   return res.redirect("/users/logout");
+};
+
+export const see = async (req, res) => {
+  // 페이지를 누구나 볼 수 있어야 하기 때문에 session의 id를 가져오지 않는다
+  // url의 id를 가져온다
+
+  const { id } = req.params;
+  const user = await User.findById(id).populate("videos");
+  if (!user) {
+    return res.status(404).render("404", { pageTitle: "User not found" });
+  }
+  // 이 유저가 업로드한 영상을 검색. 다음과 같이 해도 됨
+  //  const videos = await Video.find({ owner: user._id });
+  // 위에서는 populate를 이용했다
+
+  return res.render("user/profile", {
+    pageTitle: `${user.name}의 Profile`,
+    user: user,
+  });
 };
