@@ -22,10 +22,17 @@ export const watch = async (req, res) => {
 
 export const getEdit = async (req, res) => {
   const { id } = req.params;
+  const {
+    user: { _id },
+  } = req.session;
   const video = await Video.findById(id);
   if (!video) {
     // video 가 null일 경우
     return res.status(404).render("404", { pageTitle: "Video not found." });
+  }
+  if (String(video.owner) !== String(req.session.user._id)) {
+    //영상 소유주 외의 사람이 edit 접근 시
+    return res.status(403).redirect("/");
   }
   return res.render("edit", { pageTitle: `Edit: ${video.title}`, video });
 };
@@ -33,6 +40,9 @@ export const getEdit = async (req, res) => {
 export const postEdit = async (req, res) => {
   const { id } = req.params;
   const { title, description, hashtags } = req.body;
+  const {
+    user: { _id },
+  } = req.session;
   const video = await Video.exists({ _id: id });
   if (!video) {
     // video 가 null일 경우
@@ -44,6 +54,12 @@ export const postEdit = async (req, res) => {
     description,
     hashtags: Video.formatHashtags(hashtags),
   });
+
+  if (String(video.owner) !== String(req.session.user._id)) {
+    //영상 소유주 외의 사람이 edit 접근 시
+    return res.status(403).redirect("/");
+  }
+
   return res.redirect(`/videos/${id}`);
 };
 
@@ -79,7 +95,17 @@ export const postUpload = async (req, res) => {
 
 export const deleteVideo = async (req, res) => {
   const { id } = req.params;
-  console.log(id);
+  const {
+    user: { _id },
+  } = req.session;
+  if (!video) {
+    // video 가 null일 경우 : video를 찾지 못한 경우
+    return res.status(404).render("404", { pageTitle: "Video not found." });
+  }
+  if (String(video.owner) !== String(req.session.user._id)) {
+    //영상 소유주 외의 사람이 edit 접근 시
+    return res.status(403).redirect("/");
+  }
   await Video.findByIdAndDelete(id);
 
   return res.redirect("/");
