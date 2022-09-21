@@ -1,8 +1,9 @@
 extends base
 include mixins/video
 
-block content 
-    each uploadedvideo in videos 
-        +video(uploadedvideo)
-    else 
-        div Sorry Nothing found.
+block content
+    div.video-grid
+        each uploadedvideo in videos 
+            +video(uploadedvideo)
+        else 
+            span.empty__message No videos found

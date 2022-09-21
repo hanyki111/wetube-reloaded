@@ -5,6 +5,8 @@ block content
     form(method="GET")
         input(placeholder="Search by title", type="text", name="keyword")
         input(type="submit", value="Search")
-    div
+    div.video-grid
         each video in videos 
             +video(video)
+        else 
+            span.empty__message No videos found
