@@ -2,7 +2,7 @@ extend base.pug
 include mixins/video.pug
 
 block content
-    form(method="GET")
+    form(method="GET").search__form
         input(placeholder="Search by title", type="text", name="keyword")
         input(type="submit", value="Search")
     div.video-grid
