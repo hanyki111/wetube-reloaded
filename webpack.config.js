@@ -2,7 +2,10 @@ const path = require("path"); // 외부 모듈 갖다쓰는 것
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
-  entry: "./src/client/js/main.js", // 내가 바꾸고 싶은 파일. 처리하고 싶은 파일
+  entry: {
+    main: "./src/client/js/main.js",
+    videoPlayer: "./src/client/js/videoPlayer.js",
+  }, // 내가 바꾸고 싶은 파일. 처리하고 싶은 파일
   mode: "development",
   watch: true,
   plugins: [
@@ -11,7 +14,7 @@ module.exports = {
     }),
   ],
   output: {
-    filename: "js/main.js",
+    filename: "js/[name].js",
     path: path.resolve(__dirname, "assets"),
     clean: true,
   },
