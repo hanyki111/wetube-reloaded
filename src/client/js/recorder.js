@@ -2,19 +2,29 @@ const startBtn = document.getElementById("startBtn");
 const video = document.getElementById("preview");
 
 let stream;
+let recorder;
+
+const handleDownload = () => {};
 
 const handleStop = () => {
-  startBtn.innerText = "Start Recording";
+  startBtn.innerText = "Download Recording";
   startBtn.removeEventListener("click", handleStart);
-  startBtn.addEventListener("click", handleStop);
+  startBtn.addEventListener("click", handleDownload);
+  recorder.stop();
 };
 const handleStart = () => {
   startBtn.innerText = "Stop Recording";
   startBtn.removeEventListener("click", handleStart);
   startBtn.addEventListener("click", handleStop);
 
-  const recorder = new MediaRecorder(stream);
-  recorder.ondataavailable = (e) => console.log(e);
+  recorder = new MediaRecorder(stream);
+  recorder.ondataavailable = (event) => {
+    const videoFile = URL.createObjectURL(); //브라우저 메모리에서만 사용 가능한 url을 만들어 줌. 브라우저가 만듦.
+    video.srcObject = null;
+    video.src = videoFile;
+    video.loop = true;
+    video.play();
+  };
   recorder.start();
   setTimeout(() => {
     recorder.stop();
