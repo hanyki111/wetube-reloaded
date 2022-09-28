@@ -101,7 +101,10 @@ const handleMouseLeave = () => {
 };
 
 const handleEnded = () => {
-  fetch("/api/videos/"); // <- video id를 알기 위해 HTML element에 커스텀 데이터를 설정해야 함 : pug에 video id를 HTML 어딘가에 저장하라고 할 것 : data attribute
+  const { videoid } = videoContainer.dataset;
+  fetch(`/api/videos/${videoid}/view`, {
+    method: "POST",
+  }); // <- video id를 알기 위해 HTML element에 커스텀 데이터를 설정해야 함 : pug에 video id를 HTML 어딘가에 저장하라고 할 것 : data attribute
 };
 
 playBtn.addEventListener("click", handlePlayClick);
