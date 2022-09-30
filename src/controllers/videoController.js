@@ -1,12 +1,13 @@
 import { Schema } from "mongoose";
 import User from "../models/User";
 import Video from "../models/Video";
+import Comment from "../models/Comment";
 
 export const home = async (req, res) => {
   const videos = await Video.find({})
     .sort({ createdAt: "desc" })
     .populate("owner");
-  // console.log(videos);
+  // console.log(videos[0].thumbUrl);
   return res.render("home.pug", { pageTitle: "Home", videos });
 };
 
@@ -34,6 +35,7 @@ export const getEdit = async (req, res) => {
   }
   if (String(video.owner) !== String(req.session.user._id)) {
     //영상 소유주 외의 사람이 edit 접근 시
+    req.flash("error", "Not authorized");
     return res.status(403).redirect("/");
   }
   return res.render("edit", { pageTitle: `Edit: ${video.title}`, video });
@@ -59,6 +61,7 @@ export const postEdit = async (req, res) => {
 
   if (String(video.owner) !== String(req.session.user._id)) {
     //영상 소유주 외의 사람이 edit 접근 시
+    req.flash("error", "Not authorized");
     return res.status(403).redirect("/");
   }
 
@@ -71,14 +74,16 @@ export const getUpload = (req, res) => {
 
 export const postUpload = async (req, res) => {
   const sessionuser = req.session.user;
-  const file = req.file;
+  const { video, thumb } = req.files;
+  console.log(video, thumb);
   const { title, description, hashtags } = req.body;
 
   try {
     const newVideo = await Video.create({
       title: title,
       description: description,
-      fileUrl: file.path,
+      fileUrl: video[0].path,
+      thumbUrl: Video.changePathBackslash(thumb[0].path),
       owner: sessionuser._id,
       createdAt: Date.now(),
       hashtags: Video.formatHashtags(hashtags),
@@ -106,6 +111,7 @@ export const deleteVideo = async (req, res) => {
   }
   if (String(video.owner) !== String(req.session.user._id)) {
     //영상 소유주 외의 사람이 edit 접근 시
+    req.flash("error", "Not authorized");
     return res.status(403).redirect("/");
   }
   await Video.findByIdAndDelete(id);
@@ -137,4 +143,36 @@ export const registerView = async (req, res) => {
   video.meta.views = video.meta.views + 1;
   await video.save();
   return res.sendStatus(200);
+};
+
+export const createComment = async (req, res) => {
+  // console.log(req.params);
+  // console.log(req.body);
+  // console.log(req.session.user);
+
+  // const { id } = req.params;
+  // const { text } = req.body;
+  // const {
+  //   session: { user },
+  // } = req;
+
+  const {
+    session: { user },
+    body: { text },
+    params: { id },
+  } = req;
+
+  const video = await Video.findById(id);
+
+  if (!video) {
+    return res.sendStatus(404); //status code를 보내고 request를 끝냄
+  }
+
+  const comment = await Comment.create({
+    text,
+    owner: user._id,
+    video: id,
+  });
+
+  return res.sendStatus(201);
 };

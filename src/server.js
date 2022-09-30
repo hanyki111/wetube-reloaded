@@ -1,6 +1,7 @@
 import express from "express";
 import morgan from "morgan";
 import session from "express-session";
+import flash from "express-flash";
 import MongoStore from "connect-mongo";
 import rootRouter from "./routers/rootRouter";
 import userRouter from "./routers/userRouter";
@@ -23,6 +24,12 @@ app.use(morgan("dev"));
 //express.urlencoded 사용
 app.use(express.urlencoded({ extended: true }));
 
+// text를 보내면 req.body에 넣어줌
+// app.use(express.text());
+
+// text를 보내 json 형식으로 이해 -> headers : { "Content-Type": "application/json",} 일 때.  --> Returns middleware that only parses json and only looks at requests where the Content-Type header matches the type option.
+app.use(express.json());
+
 //express-session 사용
 app.use(
   session({
@@ -32,6 +39,8 @@ app.use(
     store: MongoStore.create({ mongoUrl: process.env.DB_URL }),
   })
 );
+
+app.use(flash());
 
 app.use(localsMiddleware);
 
