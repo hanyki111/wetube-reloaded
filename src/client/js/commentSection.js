@@ -1,7 +1,23 @@
 const videoContainer = document.getElementById("videoContainer");
 const form = document.getElementById("commentForm");
 
-const handleSubmit = (event) => {
+const addComment = (text, id) => {
+  const videoComments = document.querySelector(".video__comments ul");
+  const newComment = document.createElement("li");
+  newComment.dataset.id = id;
+  newComment.className = "video__comment";
+  const icon = document.createElement("i");
+  icon.className = "fas fa-comment";
+  const span = document.createElement("span");
+  span.innerText = `  ${text}`;
+  newComment.appendChild(icon);
+  newComment.appendChild(span);
+
+  videoComments.prepend(newComment);
+  // prepend : 맨앞, appendChild : 맨뒤
+};
+
+const handleSubmit = async (event) => {
   event.preventDefault();
   const textarea = form.querySelector("textarea");
   const videoId = videoContainer.dataset.videoid;
@@ -10,7 +26,7 @@ const handleSubmit = (event) => {
   if (text === "") {
     return;
   }
-  fetch(`/api/videos/${videoId}/comment`, {
+  const response = await fetch(`/api/videos/${videoId}/comment`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -21,7 +37,12 @@ const handleSubmit = (event) => {
     // 이걸 알아먹으려면 string으로 받아서 json object로 되돌려주는 JSON.parse 사용 : 백엔드에서
   }); // req.body를 fetch를 사용해서 만듦. fetch는 URL 변경 없이 없이 JS를 이용해 request를 보낼 수 있음
 
-  textarea.value = "";
+  if (response.status == 201) {
+    // console.log("create fake comment")
+    const json = await response.json();
+    addComment(text, newCommentId);
+    textarea.value = "";
+  }
 };
 
 if (form) {

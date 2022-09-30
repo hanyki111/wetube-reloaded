@@ -1,6 +1,7 @@
 /node_modules
-# .env
+.env
 # .env 파일은 원래라면 git에 올라가면 안 된다.
 # 나는 지금 여러 곳에서 작업을 해야하니 & 연습용이니 git에 올린다
 /uploads
 /assets
+/build

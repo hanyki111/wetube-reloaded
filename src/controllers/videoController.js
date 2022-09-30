@@ -15,7 +15,7 @@ export const watch = async (req, res) => {
   const { id } = req.params;
   // const uploader = await User.findById(video.owner);
   // mongoose 의 ref에서 언급하고 있기 때문에 변경.
-  const video = await Video.findById(id).populate("owner");
+  const video = await Video.findById(id).populate("owner").populate("comments");
 
   if (video) {
     return res.render("watch", { pageTitle: video.title, video });
@@ -174,5 +174,8 @@ export const createComment = async (req, res) => {
     video: id,
   });
 
-  return res.sendStatus(201);
+  video.comments.push(comment._id);
+  video.save();
+
+  return res.status(201).json({ newCommentId: comment._id });
 };

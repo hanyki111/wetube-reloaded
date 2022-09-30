@@ -11,7 +11,6 @@ module.exports = {
     commentSection: BASE_JS + "commentSection.js",
   }, // 내가 바꾸고 싶은 파일. 처리하고 싶은 파일
   mode: "development",
-  watch: true,
   plugins: [
     new MiniCssExtractPlugin({
       filename: "css/style.css",
